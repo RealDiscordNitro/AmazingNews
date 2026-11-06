@@ -1,1 +1,16 @@
-import{kv as _0xK}from"@vercel/kv";export default async function _0xS(r,s){if("\x50\x4F\x53\x54"!==r.method)return s.status(405).send("");await _0xK.sadd("\x5F\x73\x75\x62",JSON.stringify(r.body));s.status(200).json({s:1});}
+import Redis from "ioredis";
+
+const redis = new Redis(process.env.REDIS_URL);
+
+export default async function handler(req, res) {
+    if (req.method !== "POST") return res.status(405).send("");
+    
+    try {
+        const sub = req.body;
+        const packedData = `${sub.endpoint}|${sub.keys.p256dh}|${sub.keys.auth}`;
+        await redis.sadd("subs", packedData);
+        res.status(200).json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+}
