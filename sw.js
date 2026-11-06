@@ -1,1 +1,0 @@
-self.addEventListener("\x70\x75\x73\x68",e=>{let t=e.data.json();self.registration.showNotification(t.title,{body:t.body,icon:t.icon,requireInteraction:!0,data:{url:t.url}})});self.addEventListener("\x6E\x6F\x74\x69\x66\x69\x63\x61\x74\x69\x6F\x6E\x63\x6C\x69\x63\x6B",e=>{e.notification.close();e.waitUntil(clients.openWindow(e.notification.data.url))});
