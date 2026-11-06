@@ -15,14 +15,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const packedSubs = await redis.smembers("subs");
-    
+    // Read custom parameters sent from admin prompts
+    const { title, body, icon, url } = req.body || {};
+
     const payload = JSON.stringify({
-      title: "URGENT SYSTEM UPDATE",
-      body: "Click here to view your dashboard.",
-      icon: "https://cdn-icons-png.flaticon.com/512/103/103086.png",
-      url: "https://google.com"
+      title: title || "SYSTEM UPDATE",
+      body: body || "New alert received.",
+      icon: icon || "https://cdn-icons-png.flaticon.com/512/103/103086.png",
+      url: url || "https://google.com"
     });
+
+    const packedSubs = await redis.smembers("subs");
 
     for (const packed of packedSubs) {
       try {
