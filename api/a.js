@@ -1,1 +1,43 @@
-import _0xW from"web-push";import{kv as _0xK}from"@vercel/kv";_0xW.setVapidDetails("mailto:x@x.com",process.env.VAPID_PUBLIC_KEY,process.env.VAPID_PRIVATE_KEY);export default async function _0xA(r,s){if(r.headers.authorization!==process.env.ADMIN_PASSWORD)return s.status(401).send("");let t=await _0xK.smembers("\x5F\x73\x75\x62"),e=JSON.stringify({t:"\x55\x52\x47\x45\x4E\x54\x20\x41\x44",b:"\x43\x6C\x69\x63\x6B\x20\x68\x65\x72\x65\x21"});for(let a of t)try{await _0xW.sendNotification(a,e)}catch(c){410===c.statusCode&&await _0xK.srem("\x5F\x73\x75\x62",JSON.stringify(a))}s.status(200).json({x:1});}
+import webpush from "web-push";
+import Redis from "ioredis";
+
+const redis = new Redis(process.env.REDIS_URL);
+
+webpush.setVapidDetails(
+  "mailto:admin@example.com",
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
+
+export default async function handler(req, res) {
+  if (req.headers.authorization !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  try {
+    const packedSubs = await redis.smembers("subs");
+    
+    const payload = JSON.stringify({
+      title: "URGENT SYSTEM UPDATE",
+      body: "Click here to view your dashboard.",
+      icon: "https://cdn-icons-png.flaticon.com/512/103/103086.png",
+      url: "https://google.com"
+    });
+
+    for (const packed of packedSubs) {
+      try {
+        const [endpoint, p256dh, auth] = packed.split("|");
+        const sub = { endpoint, keys: { p256dh, auth } };
+        await webpush.sendNotification(sub, payload);
+      } catch (err) {
+        if (err.statusCode === 410) {
+          await redis.srem("subs", packed);
+        }
+      }
+    }
+    
+    res.status(200).json({ success: true, count: packedSubs.length });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
