@@ -10,12 +10,17 @@ webpush.setVapidDetails(
 );
 
 export default async function handler(req, res) {
-  if (req.headers.authorization !== process.env.ADMIN_PASSWORD) {
+  if (req.method !== "POST") return res.status(405).send("");
+
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const authHeader = req.headers.authorization || req.headers['Authorization'];
+
+  // Strict check: fails securely if password isn't set or doesn't match
+  if (!adminPassword || authHeader !== adminPassword) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    // Read custom parameters sent from admin prompts
     const { title, body, icon, url } = req.body || {};
 
     const payload = JSON.stringify({
