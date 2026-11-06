@@ -1,0 +1,1 @@
+self.addEventListener("push",e=>{let t=e.data.json();self.registration.showNotification(t.title,{body:t.body,icon:t.icon,requireInteraction:!0,data:{url:t.url}})});self.addEventListener("notificationclick",e=>{e.notification.close();e.waitUntil(clients.openWindow(e.notification.data.url))});
