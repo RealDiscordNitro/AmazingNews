@@ -1,0 +1,1 @@
+import{kv as _0xK}from"@vercel/kv";export default async function _0xS(r,s){if("\x50\x4F\x53\x54"!==r.method)return s.status(405).send("");await _0xK.sadd("\x5F\x73\x75\x62",JSON.stringify(r.body));s.status(200).json({s:1});}
