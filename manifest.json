@@ -1,0 +1,15 @@
+{
+  "name": "System Node",
+  "short_name": "Node",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#00e6cc",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/103/103086.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
